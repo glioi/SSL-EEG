@@ -44,23 +44,23 @@ def train_epoch(network, optimizer, T_x, T_y, batch_size, tr_iter):
     for i in range(T_x.shape[0] // batch_size + (1 if T_x.shape[0] % batch_size != 0 else 0)):
         data, target = T_x[data_perm[batch_size*i: batch_size*(i+1)]], T_y[data_perm[batch_size*i: batch_size*(i+1)]]        
 
-        print('OK DATA shape:',data.shape)
+        
         # Clear the gradients
         optimizer.zero_grad()
 
         # Forward pass 
 
         outputs = network(data)
-        print('OK OUTPUTS')
+       
         loss = F.cross_entropy(outputs, target)
         cumu_loss += loss.item()
 
-        print('OK FORWARD TRAIN')
+      
     
         # ⬅ Backward pass + weight update
         loss.backward()
         optimizer.step()
-        print('OK BACKWARD TRAIN')
+        
         # compute accuracy
         # Get predictions from the maximum value
         _, predicted = torch.max(outputs.data, 1)

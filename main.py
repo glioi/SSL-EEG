@@ -21,15 +21,15 @@ from utils import loso,train_epoch,validate_epoch,test
 ###  parameters (do it with argparse at some point!!)
 path='/home/g20lioi/fixe/datasets/BCI/bci4/'
 resultdir='/home/g20lioi/fixe/datasets/BCI/bci4/results_SSL_GIGI/'
-batch_size=32
+batch_size=5
 n_subjects=9 #total number of subjects in the dataset 
 n_classes=4
 cuda = torch.cuda.is_available()  # check if GPU is available, if True chooses to use it
 device = 'cuda' if cuda else 'cpu'
 test_subject=3
 learning_rate=1e-3
-n_epochs=100
-patience=40
+n_epochs=10
+patience=4
 
 print("Importing local files: ", end = '')
 
@@ -45,10 +45,12 @@ def build_network(n_classes,n_chans,time_samples):
 
 ### generate the dataset split
 T_x,T_y, V_x,V_y,Test_x,Test_y=loso(test_subject,n_subjects, path,device)
-print('train data shape:',T_x.shape)
+print('train data shape:\n batch size {} \n n electrodes {} \n n time samples {}'.format(batch_size,T_x.shape[1],T_x.shape[2]))
 
 ### model and optimizer
 model=build_network(n_classes,T_x.shape[1],T_x.shape[2])
+
+#############
 optimizer = optim.AdamW(model.parameters(),lr=learning_rate,  weight_decay=0.01, amsgrad=True)
 
 
@@ -58,16 +60,11 @@ Train_loss=[]
 Val_loss=[]
 Test_acc=[]
 
-
 tr_iter=0
 v_itr=0
 maxv=0
 cpt_early = 0
 
-
-
-outputs=model(torch.rand(batch_size,T_x.shape[1],T_x.shape[2],dtype=double))
-print(outputs.shape)
 
 for e in range(n_epochs):
     print('epoch:',e)
